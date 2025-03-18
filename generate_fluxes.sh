@@ -2,7 +2,7 @@
 
 # Prepare flux files for inject_sources.sh
 
-if [[ -z ${MYCODE} ]]
+if [[ -z "/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness" ]]
 then
     echo "Error: The MYCODE variable is missing. Exiting."
     exit 1
@@ -98,12 +98,12 @@ cd "${pos_outdir}" || exit 1
 
 # Run Python script to generate RA and Dec positions
 singularity exec \
--B "$MYCODE" \
-"$CONTAINER" \
-"$MYCODE/generate_pos.py" \
+-B "/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/" \
+"$GXCONTAINER" \
+"/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/generate_pos.py" \
 --nsrc="$nsrc" \
 --region="$region" \
---sep-min="$sep_min" \
+--sep_min="$sep_min" \
 source_pos.txt
 
 cd "${basedir}" || exit 1

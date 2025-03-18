@@ -65,11 +65,11 @@ while read line; do
 done < $flux_list
 nflux=$i
 
-input_map="${input_map_dir}/${imageset_name}_rescaled.fits" # Potentially this may miss ddmod.fits
-input_map_comp="${input_map_dir}/${imageset_name}_psf_comp_rescaled.fits"
-input_map_rms="${input_map_dir}/${imageset_name}_rms_rescaled.fits"
-input_map_bkg="${input_map_dir}/${imageset_name}_bkg_rescaled.fits"
-input_map_psf="${input_map_dir}/${imageset_name}_projpsf_psf.fits"
+input_map="${input_map_dir}/${imageset_name}_ddmod.fits" # Potentially this may miss ddmod.fits
+input_map_comp="${input_map_dir}/${imageset_name}_ddmod_comp.fits"
+input_map_rms="${input_map_dir}/${imageset_name}_ddmod_rms.fits"
+input_map_bkg="${input_map_dir}/${imageset_name}_ddmod_bkg.fits"
+input_map_psf="${input_map_dir}/${imageset_name}_ddmod_projpsf_psf.fits"
 
 for file in "${input_map}" "${input_map_comp}" "${input_map_rms}" "${input_map_bkg}" "${input_map_psf}" "${input_sources}"; do
     if [ ! -e "${file}" ]; then
@@ -111,7 +111,7 @@ if [[ ! -e "${input_map_comp}" ]]
 then
     # Run Aegean on real image
     singularity exec \
-    "$CONTAINER" \
+    "$GXCONTAINER" \
     aegean \
     --progress \
     --cores=$ncpus \
@@ -138,7 +138,7 @@ rm -f aegean_list.txt
 
 # Select RA and Dec columns in Aegean list of real sources; add type=1 col to indicate that these are real sources
 singularity exec \
-"$CONTAINER" \
+"$GXCONTAINER" \
 stilts tpipe \
 ifmt="${iformat}" \
 in="${aegean_comp}" \
@@ -152,7 +152,7 @@ rm -f "${aegean_comp}"
 
 # Select RA and Dec columns in list of simulated sources; add type=0 col to indicate these are simulated sources
 singularity exec \
-"$CONTAINER" \
+"$GXCONTAINER" \
 stilts tpipe \
 ifmt=ascii \
 in="$input_sources" \
@@ -164,7 +164,7 @@ cmd='keepcols "ra dec type"'
 
 # Concatenate real and simulated source lists
 singularity exec \
-"$CONTAINER" \
+"$GXCONTAINER" \
 stilts tcat \
 ifmt=ascii \
 in=t \
@@ -183,8 +183,9 @@ for ((i=1; i<=($nflux); i++ )); do
     
     # Get PSF size and blurring factor at the location of each simulated source
     singularity exec \
-    "$CONTAINER" \
-    "$MYCODE/calc_r_ratio_cmp.py" \
+    -B "/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/" \
+    "$GXCONTAINER" \
+    "/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/calc_r_ratio_cmp.py" \
     --z=$z \
     --flux="$s_lin" \
     "$input_sources" \
@@ -197,7 +198,7 @@ for ((i=1; i<=($nflux); i++ )); do
     # the peak fluxes of the injected sources should NOT be suppressed by the blurring factor
     # (i.e. the peak fluxes should be equal to the integrated fluxes)
     singularity exec \
-    "$CONTAINER" \
+    "$GXCONTAINER" \
     stilts tpipe \
     ifmt=ascii \
     ofmt=votable \
@@ -235,7 +236,7 @@ for ((i=1; i<=($nflux); i++ )); do
     
     # Add simulated sources to real map
     singularity exec \
-    "$CONTAINER" \
+    "$GXCONTAINER" \
     AeRes \
     -c aegean_source_list.vot \
     -f "$input_map" \
@@ -246,7 +247,7 @@ for ((i=1; i<=($nflux); i++ )); do
     
     # Run Aegean on sim_and_real_map.fits (this is the real image + simulated sources); use existing rms and background images
     singularity exec \
-    "$CONTAINER" \
+    "$GXCONTAINER" \
     aegean \
     --progress \
     --cores=$ncpus \
@@ -264,7 +265,7 @@ for ((i=1; i<=($nflux); i++ )); do
     
     # Match sources detected in the simulated image with the list of real & simulated sources for the image
     singularity exec \
-    "$CONTAINER" \
+    "$GXCONTAINER" \
     stilts tskymatch2 \
     in1=aegean_SIM_list_comp.vot \
     in2=real_and_sim_list.txt \
@@ -283,7 +284,7 @@ for ((i=1; i<=($nflux); i++ )); do
     
     # Select sources in match_list.txt that have type=0
     singularity exec \
-    "$CONTAINER" \
+    "$GXCONTAINER" \
     stilts tpipe \
     ifmt=ascii \
     in=match_list.txt \

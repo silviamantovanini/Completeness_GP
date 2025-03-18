@@ -4,7 +4,7 @@
 # (2) Generate completeness map at each flux density
 echo $SINGULARITY_BINDPATH
 
-if [[ -z $MYCODE ]]
+if [[ -z /software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness ]]
 then
     echo "Error: The MYCODE environment variable is not set. Exiting. "
     exit 1
@@ -57,8 +57,8 @@ output_dir = $output_dir
 EOPAR
 
 # Run Python script
-singularity exec $CONTAINER \
-"$MYCODE/make_cmp_map.py" \
+singularity exec -B "/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/" $GXCONTAINER \
+"/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/make_cmp_map.py" \
 --flux="$flux" \
 --region="$region" \
 --rad="$rad" \

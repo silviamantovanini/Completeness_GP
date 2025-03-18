@@ -46,12 +46,12 @@ parser.add_argument(
     "--region",
     type=str,
     default="0,360,-90,90",
-    help="Region of sky. Enter ra_min, ra_max, dec_min, "
-    "dec_max, in deg. For example, for 60 < RA < 300 enter: 60,300,-90,90. For RA < 60 or RA > 300, and -40 < Dec < -10, enter: "
+    help="Region of sky. Enter ra_min, ra_max, dec_min, dec_max, in deg." 
+    "For example, for 60 < RA < 300 enter: 60,300,-90,90. For RA < 60 or RA > 300, and -40 < Dec < -10, enter: "
     "300,60,-40,-10. [default=%default]",
 )
 parser.add_argument(
-    "--sep-min",
+    "--sep_min",
     type=float,
     default=0.0,
     help="Minimum separation between simulated sources, in arcmin "
@@ -104,6 +104,7 @@ ras = np.zeros(nsrc)
 decs = np.zeros(nsrc)
 mask = ras == 0
 min_sep = args.sep_min * u.arcmin
+plane = np.ones_like(ras, dtype=bool)
 
 c = 0
 success = False
@@ -111,21 +112,25 @@ while (success is False) and (c < max_attempts):
     ras[mask] = np.random.uniform(low=ra_min, high=ra_max, size=np.sum(mask))
     ras = np.where(ras >= 360, ras - 360, ras)
 
+    # Generate random Dec values
     r = np.random.uniform(low=0.0, high=1.0, size=np.sum(mask))
-    decs[mask] = np.rad2deg(
-        np.arcsin((np.sin(dec_max) - np.sin(dec_min)) * r + np.sin(dec_min))
-    )
+    decs[mask] = np.rad2deg(np.arcsin((np.sin(dec_max) - np.sin(dec_min)) * r + np.sin(dec_min)))
 
+    # Convert to Galactic coordinates and exclude latitude of no interest
     pos = SkyCoord(ras * u.deg, decs * u.deg)
-    seps = match_coordinates_sky(pos, pos, nthneighbor=2)
+    galactic_lat = pos.galactic.b.deg
+    plane &= (np.abs(galactic_lat) >=4) & (np.abs(galactic_lat) <= 11)
 
-    mask = seps[1] < min_sep
+    # Calculate separation with the filtered positions
+    pos_filtered = SkyCoord(ras[plane] * u.deg, decs[plane] * u.deg)
+    seps = match_coordinates_sky(pos_filtered, pos_filtered, nthneighbor=2)
+
+    mask[plane] = seps[1] < min_sep
     print(f"Pass {c+1} : Accepted {np.sum(~mask)}")
-    if np.all(~mask):
+    if np.all(~mask[plane]):
         success = True
 
     c += 1
-
 
 if not success:
     print("Injection did not converge. Was --sep-min to large?")

@@ -3,19 +3,19 @@
 # Generate list of random RA and Dec positions in specified region of sky
 
 #SBATCH --account=pawsey0272
-#SBATCH --partition=workq
-#SBATCH --clusters=magnus
+#SBATCH --partition=work
+#SBATCH --clusters=setonix
 #SBATCH --nodes=1
-#SBATCH --output=/astro/mwasci/tfranzen/generate_pos.o%A
-#SBATCH --error=/astro/mwasci/tfranzen/generate_pos.e%A
-#SBATCH --export=NONE
+#SBATCH --output=/software/projects/pawsey0272/smantovanini/GLEAM-X-pipeline/log_setonix/generate_pos.o%A
+#SBATCH --error=/software/projects/pawsey0272/smantovanini/GLEAM-X-pipeline/log_setonix//generate_pos.e%A
+#SBATCH --export=all
 
-echo "Reminder on this branch this is not needed. Exiting. "
-exit 1
+#echo "Reminder on this branch this is not needed. Exiting. "
+#exit 1
 
-module load singularity
+module load singularity/4.1.0-slurm
 echo $SINGULARITY_BINDPATH
-export containerImage=/astro/mwasci/tgalvin/gleamx_testing_small.img
+export containerImage=$GXCONTAINER
 
 start_time=$(date +%s)
 
@@ -54,14 +54,14 @@ output_dir = $output_dir
 EOPAR
 
 # Run Python script to generate RA and Dec positions
-singularity exec $containerImage $MYCODE/generate_pos.py --nsrc=$nsrc --region=$region --sep_min=$sep_min source_pos.txt
+singularity exec -B "/software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/" $containerImage /software/projects/pawsey0272/smantovanini/GLEAM-X-Completeness/generate_pos.py --nsrc=$nsrc --region=$region --sep_min=$sep_min source_pos.txt
 
 end_time=$(date +%s)
 duration=$(echo "$end_time-$start_time" | bc -l)
 echo "Total runtime = $duration sec"
 
 # Move output and error files to output directory
-root=/astro/mwasci/$USER/generate_pos
-mv $root.o${SLURM_JOB_ID} $root.e${SLURM_JOB_ID} .
+#root=/astro/mwasci/$USER/generate_pos
+#mv $root.o${SLURM_JOB_ID} $root.e${SLURM_JOB_ID} .
 
 exit 0
