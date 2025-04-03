@@ -136,13 +136,13 @@ dec_inj = np.array(dec_inj)
 ninj = len(ra_inj)
 
 # Adding to remove the GP from calculations
-sky_inj = SkyCoord(ra_inj * u.deg, dec_inj * u.deg)
-gal_inj_lat = sky_inj.galactic.b.deg
+#sky_inj = SkyCoord(ra_inj * u.deg, dec_inj * u.deg)
+#gal_inj_lat = sky_inj.galactic.b.deg
 
-mask_inj = (np.abs(gal_inj_lat) >= 4) & (np.abs(gal_inj_lat) <= 11)
+#mask_inj = (np.abs(gal_inj_lat) >= 4) & (np.abs(gal_inj_lat) <= 11)
 
-ra_inj = ra_inj[mask_inj]
-dec_inj = dec_inj[mask_inj]
+#ra_inj = ra_inj[mask_inj]
+#dec_inj = dec_inj[mask_inj]
 ##
 
 # Read FITS catalogues with detected simulated sources
@@ -162,14 +162,16 @@ for i in range(0, sdim):
     ra, dec = read_catalogue(input_catalogue[0])
 
     # Another add to avoid GP:
-    sky_det = SkyCoord(ra * u.deg, dec * u.deg)
-    gal_det_lat = sky_det.galactic.b.deg
+    #sky_det = SkyCoord(ra * u.deg, dec * u.deg)
+    #gal_det_lat = sky_det.galactic.b.deg
 
-    mask_det = (np.abs(gal_det_lat) >= 4) & (np.abs(gal_det_lat) <= 11)
+    #mask_det = (np.abs(gal_det_lat) >= 4) & (np.abs(gal_det_lat) <= 11)
     
-    ra_det.append(ra[mask_det])
-    dec_det.append(dec[mask_det])
+    #ra_det.append(ra[mask_det])
+    #dec_det.append(dec[mask_det])
     ##
+    ra_det.append(ra)
+    dec_det.append(dec)
 
 # Calculate completeness as a function of flux density and print results to file
 cmp = []
