@@ -119,6 +119,7 @@ then
     --table=aegean_list.vot \
     --noise="$input_map_rms" \
     --background="$input_map_bkg" \
+    --regions="plane.mim" \
     --seedclip="$sigma" \
     --floodclip=4 \
     --maxsummits=5 \
@@ -254,6 +255,7 @@ for ((i=1; i<=($nflux); i++ )); do
     --cores=$ncpus \
     --out=aegean_SIM_list.txt \
     --table=aegean_SIM_list.vot \
+    --region "plane.mim"
     --noise="$input_map_rms" \
     --background="$input_map_bkg" \
     --seedclip="$sigma" \
