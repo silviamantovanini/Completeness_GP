@@ -65,7 +65,7 @@ while read line; do
 done < $flux_list
 nflux=$i
 
-input_map="${input_map_dir}/${imageset_name}_ddmod.fits" # Potentially this may miss ddmod.fits
+input_map="${input_map_dir}/${imageset_name}_ddmod.fits"
 input_map_comp="${input_map_dir}/${imageset_name}_ddmod_comp.fits"
 input_map_rms="${input_map_dir}/${imageset_name}_ddmod_rms.fits"
 input_map_bkg="${input_map_dir}/${imageset_name}_ddmod_bkg.fits"
@@ -122,6 +122,7 @@ then
     --seedclip="$sigma" \
     --floodclip=4 \
     --maxsummits=5 \
+    --region="/scratch/pawsey0272/smantovanini/IDG/GalacticPlane/Completeness/plane.mim" \
     --psf="$input_map_psf" \
     "$input_map"
     
@@ -256,6 +257,7 @@ for ((i=1; i<=($nflux); i++ )); do
     --noise="$input_map_rms" \
     --background="$input_map_bkg" \
     --seedclip="$sigma" \
+    --region="/scratch/pawsey0272/smantovanini/IDG/GalacticPlane/Completeness/plane.mim" \
     --floodclip=4 \
     --maxsummits=5 \
     --psf="$input_map_psf" "sim_and_real_map_flux${s}.fits"
