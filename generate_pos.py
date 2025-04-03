@@ -104,11 +104,11 @@ ras = np.zeros(nsrc)
 decs = np.zeros(nsrc)
 mask = ras == 0
 min_sep = args.sep_min * u.arcmin
-plane = np.ones_like(ras, dtype=bool)
 
 c = 0
 success = False
 while (success is False) and (c < max_attempts):
+    # Generate random RA values
     ras[mask] = np.random.uniform(low=ra_min, high=ra_max, size=np.sum(mask))
     ras = np.where(ras >= 360, ras - 360, ras)
 
@@ -119,15 +119,16 @@ while (success is False) and (c < max_attempts):
     # Convert to Galactic coordinates and exclude latitude of no interest
     pos = SkyCoord(ras * u.deg, decs * u.deg)
     galactic_lat = pos.galactic.b.deg
-    plane &= (np.abs(galactic_lat) >=4) & (np.abs(galactic_lat) <= 11)
+    plane = (np.abs(galactic_lat) >=4) & (np.abs(galactic_lat) <= 11)
 
     # Calculate separation with the filtered positions
     pos_filtered = SkyCoord(ras[plane] * u.deg, decs[plane] * u.deg)
-    seps = match_coordinates_sky(pos_filtered, pos_filtered, nthneighbor=2)
-
-    mask[plane] = seps[1] < min_sep
+    if len(pos_filtered) >1:
+        seps = match_coordinates_sky(pos_filtered, pos_filtered, nthneighbor=2)
+        mask[plane] = seps[1] < min_sep
+    
     print(f"Pass {c+1} : Accepted {np.sum(~mask)}")
-    if np.all(~mask[plane]):
+    if np.all(~mask):
         success = True
 
     c += 1

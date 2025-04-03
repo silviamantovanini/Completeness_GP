@@ -123,6 +123,7 @@ then
     --seedclip="$sigma" \
     --floodclip=4 \
     --maxsummits=5 \
+    --region="/scratch/pawsey0272/smantovanini/IDG/GalacticPlane/Completeness/plane.mim" \
     --psf="$input_map_psf" \
     "$input_map"
     
@@ -258,6 +259,7 @@ for ((i=1; i<=($nflux); i++ )); do
     --noise="$input_map_rms" \
     --background="$input_map_bkg" \
     --seedclip="$sigma" \
+    --region="/scratch/pawsey0272/smantovanini/IDG/GalacticPlane/Completeness/plane.mim" \
     --floodclip=4 \
     --maxsummits=5 \
     --psf="$input_map_psf" "sim_and_real_map_flux${s}.fits"
