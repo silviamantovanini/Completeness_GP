@@ -65,7 +65,7 @@ while read line; do
 done < $flux_list
 nflux=$i
 
-input_map="${input_map_dir}/${imageset_name}_ddmod.fits" # Potentially this may miss ddmod.fits
+input_map="${input_map_dir}/${imageset_name}_ddmod.fits"
 input_map_comp="${input_map_dir}/${imageset_name}_ddmod_comp.fits"
 input_map_rms="${input_map_dir}/${imageset_name}_ddmod_rms.fits"
 input_map_bkg="${input_map_dir}/${imageset_name}_ddmod_bkg.fits"
@@ -119,6 +119,7 @@ then
     --table=aegean_list.vot \
     --noise="$input_map_rms" \
     --background="$input_map_bkg" \
+    --regions="plane.mim" \
     --seedclip="$sigma" \
     --floodclip=4 \
     --maxsummits=5 \
@@ -253,6 +254,7 @@ for ((i=1; i<=($nflux); i++ )); do
     --cores=$ncpus \
     --out=aegean_SIM_list.txt \
     --table=aegean_SIM_list.vot \
+    --region "plane.mim"
     --noise="$input_map_rms" \
     --background="$input_map_bkg" \
     --seedclip="$sigma" \
